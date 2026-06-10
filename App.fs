@@ -1,6 +1,5 @@
 module Demo.App
 
-open Fable.Core
 open FSharp.Data.Adaptive
 open Aardvark.Portable
 open Aardvark.Portable.Render
@@ -86,19 +85,19 @@ let private angle    = cval 0.0
 let private tint     = tintIdx |> AVal.map (fun i -> snd tints.[i % tints.Length])
 let private tintName = tintIdx |> AVal.map (fun i -> fst tints.[i % tints.Length])
 
-/// requestAnimationFrame loop advancing the spin angle (dt-scaled).
-[<Emit("requestAnimationFrame($0)")>]
-let private raf (_cb: float -> unit) : unit = jsNative
-
-let private startSpin () =
-    let mutable last = 0.0
-    let rec tick (now: float) =
-        let dt = if last = 0.0 then 0.0 else (now - last) / 1000.0
-        last <- now
-        transact (fun () ->
-            angle.Value <- angle.Value + dt * 0.5 * speed.Value)
-        raf tick
-    raf tick
+/// Per-frame spin step, driven from `RenderControl.OnRendered` — no
+/// requestAnimationFrame anywhere: the angle write marks the scene,
+/// which schedules the next frame (the render-feedback loop the
+/// portable controllers use too). dt comes from a wall clock so the
+/// integration follows real time.
+let private spinStart = System.DateTime.UtcNow
+let mutable private spinLast = 0.0
+let private spinTick (_e: RenderControlEventInfo) =
+    let t = (System.DateTime.UtcNow - spinStart).TotalSeconds
+    let dt = max 0.0 (min 0.1 (t - spinLast))
+    spinLast <- t
+    transact (fun () ->
+        angle.Value <- angle.Value + dt * 0.5 * speed.Value)
 
 // ─── Scene: a spinning box with the custom effect ─────────────────────
 
@@ -108,14 +107,15 @@ let private scene : ISceneNode =
         Sg.Effect stripeEffect
         Sg.Uniform ("Tint", tint)
         Sg.Trafo spin
-        Sg.Adapter (Primitives.box ())
+        // Aardvark.Dom-style ready-made primitive (mesh + Model trafo +
+        // Colors attribute) — no Sg.Adapter boilerplate.
+        Primitives.Box (V3d.create 1.0 1.0 1.0)
     }
 
 // ─── App: renderControl + adaptive DOM overlay ────────────────────────
 
 let app : App = fun ctx ->
     ctx.SetTitle "Aardvark.Portable demo"
-    startSpin ()
 
     let cam =
         OrbitController.attach
@@ -128,6 +128,9 @@ let app : App = fun ctx ->
         Dom.Style "width:100%; height:100vh; touch-action:none; user-select:none; position:relative; background:#16181d"
         renderControl {
             Dom.Style "width:100%; height:100%"
+            // Per-frame spin step — the Aardvark.Dom way to animate
+            // (RenderControl.OnRendered), replacing the old rAF loop.
+            RenderControl.OnRendered spinTick
             cam.Attributes
             cam.Camera
             cam.Frustum
