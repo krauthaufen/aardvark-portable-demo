@@ -23,16 +23,13 @@ npm run dev             # fable compile + vite dev server
 
 Requires a WebGPU-capable browser (secure context — localhost counts).
 
-## Packaging notes (consumer gotchas)
+## Packaging notes
 
-- **FSharp.Core**: the portable packages require `>= 10.1.301`, but Fable's
-  design-time build injects an implicit `FSharp.Core 10.0.x`, which NuGet
-  rejects as a downgrade (NU1605). The fsproj pins it with
-  `<PackageReference Update="FSharp.Core" Version="10.1.301" />`
-  (`Update`, not `Include` — a second `Include` is a duplicate, NU1504).
-- **Fable.AST**: the shader plugin's attributes derive from `Fable.AST`
-  types, and `Aardvark.Portable.Shader.Plugin` does not (yet) flow that
-  dependency — reference `Fable.AST 5.0.0` directly alongside the plugin.
+- Three package references is all it takes (the web shell pulls the rest
+  transitively). The early `prerelease0001` packages needed an FSharp.Core
+  `Update`-pin and a direct `Fable.AST` reference — both fixed since
+  `prerelease0002/0003` (relaxed + floor-built FSharp.Core dependency; the
+  plugin flows its own Fable.AST).
 - **The plugin must be a direct reference** — `dotnet fable` only scans
   direct package references for compiler plugins.
 - npm side: `@aardworx/wombat.{base,adaptive,shader,rendering,dom}` versions
