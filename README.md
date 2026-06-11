@@ -44,7 +44,7 @@ Requires a WebGPU-capable browser (secure context — localhost counts).
   (the `FSharp.Data.Adaptive` namespace comes from
   `Aardvark.Portable.Adaptive`'s shim over `@aardworx/wombat.adaptive`),
   and the IDE reads real symbols from the netstandard2.0 dlls.
-  `OutputType Exe` + `[<EntryPoint>]` still work — `dotnet build`
-  produces a plain dll and Fable emits the entry-point call into the
-  generated JS; only `dotnet run` refuses (the web app is run by vite,
-  never by dotnet).
+  No `OutputType Exe`: Fable emits the `[<EntryPoint>]` invocation
+  into the generated JS regardless, so the project stays a plain
+  netstandard2.0 classlib — nothing for IDE run configurations to
+  trip over (the web app is run by vite, never by dotnet).
