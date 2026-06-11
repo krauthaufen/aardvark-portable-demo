@@ -18,5 +18,11 @@
          wombat IR. Must be a DIRECT reference so `dotnet fable` discovers it
          (it flows its own Fable.AST dependency). -->
     <PackageReference Include="Aardvark.Portable.Shader.Plugin" Version="0.1.0-prerelease0008" />
+    <!-- The portable packages declare FSharp.Data.Adaptive for their .NET
+         dlls; on Fable the FSharp.Data.Adaptive namespace is provided by
+         Aardvark.Portable.Adaptive's shim over @aardworx/wombat.adaptive.
+         Excluding the real package's assets keeps Fable from downloading
+         and compiling its sources into fable_modules. -->
+    <PackageReference Include="FSharp.Data.Adaptive" Version="1.2.26" ExcludeAssets="all" />
   </ItemGroup>
 </Project>
