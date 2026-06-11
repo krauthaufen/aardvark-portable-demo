@@ -35,3 +35,10 @@ Requires a WebGPU-capable browser (secure context — localhost counts).
 - npm side: `@aardworx/wombat.{base,adaptive,shader,rendering,dom}` versions
   must satisfy the ranges the backend bindings were built against (see
   `package.json`).
+- **Pin `FSharp.Data.Adaptive` with `ExcludeAssets="all"`.** The portable
+  packages declare it for their .NET dlls; on Fable the
+  `FSharp.Data.Adaptive` namespace is provided by
+  `Aardvark.Portable.Adaptive`'s shim over `@aardworx/wombat.adaptive`.
+  Without the exclusion, `dotnet fable` downloads and compiles the real
+  FSharp.Data.Adaptive sources into `fable_modules` — slow, and a second
+  (unused) adaptive system in the compilation.
