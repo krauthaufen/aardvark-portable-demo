@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Standalone Fable demo consuming the published Aardvark.Portable packages: a custom-shader spinning cube (WebGPU via wombat) with an adaptive DOM overlay.</Description>
   </PropertyGroup>
   <ItemGroup>
@@ -11,18 +11,12 @@
   <ItemGroup>
     <!-- The web shell transitively brings Aardvark.Portable{,.Adaptive,.Render,.Dom,.Host}
          and the wombat backend bindings. -->
-    <PackageReference Include="Aardvark.Portable.Shell.Web" Version="0.1.0-prerelease0008" />
+    <PackageReference Include="Aardvark.Portable.Shell.Web" Version="0.1.0-prerelease0010" />
     <!-- Portable shader surface (FShade-syntax shaders on both backends). -->
-    <PackageReference Include="Aardvark.Portable.Shader" Version="0.1.0-prerelease0008" />
+    <PackageReference Include="Aardvark.Portable.Shader" Version="0.1.0-prerelease0010" />
     <!-- The Fable compiler plugin that translates [<ShaderEffect>] functions to
          wombat IR. Must be a DIRECT reference so `dotnet fable` discovers it
          (it flows its own Fable.AST dependency). -->
-    <PackageReference Include="Aardvark.Portable.Shader.Plugin" Version="0.1.0-prerelease0008" />
-    <!-- The portable packages declare FSharp.Data.Adaptive for their .NET
-         dlls; on Fable the FSharp.Data.Adaptive namespace is provided by
-         Aardvark.Portable.Adaptive's shim over @aardworx/wombat.adaptive.
-         Excluding the real package's assets keeps Fable from downloading
-         and compiling its sources into fable_modules. -->
-    <PackageReference Include="FSharp.Data.Adaptive" Version="1.2.26" ExcludeAssets="all" />
+    <PackageReference Include="Aardvark.Portable.Shader.Plugin" Version="0.1.0-prerelease0010" />
   </ItemGroup>
 </Project>

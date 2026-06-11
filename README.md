@@ -35,10 +35,12 @@ Requires a WebGPU-capable browser (secure context — localhost counts).
 - npm side: `@aardworx/wombat.{base,adaptive,shader,rendering,dom}` versions
   must satisfy the ranges the backend bindings were built against (see
   `package.json`).
-- **Pin `FSharp.Data.Adaptive` with `ExcludeAssets="all"`.** The portable
-  packages declare it for their .NET dlls; on Fable the
-  `FSharp.Data.Adaptive` namespace is provided by
-  `Aardvark.Portable.Adaptive`'s shim over `@aardworx/wombat.adaptive`.
-  Without the exclusion, `dotnet fable` downloads and compiles the real
-  FSharp.Data.Adaptive sources into `fable_modules` — slow, and a second
-  (unused) adaptive system in the compilation.
+- **Target `netstandard2.0`** (since `prerelease0010`). The packages
+  multi-target net10.0 (the .NET arm) and netstandard2.0 (the Fable arm
+  as a real assembly); the nuget dependency groups put Aardvark.*,
+  FShade.* and FSharp.Data.Adaptive under net10.0 only. A
+  netstandard2.0 web project therefore restores none of the .NET
+  rendering stack, `dotnet fable` compiles only the portable sources
+  (the `FSharp.Data.Adaptive` namespace comes from
+  `Aardvark.Portable.Adaptive`'s shim over `@aardworx/wombat.adaptive`),
+  and the IDE reads real symbols from the netstandard2.0 dlls.
